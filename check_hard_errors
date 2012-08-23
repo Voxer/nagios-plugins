@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Copyright 2010-2012 Voxer IP LLC. All rights reserved.
+# License: MIT
+#
+# Check for hard errors with kstat nagios style
+#
+# Author: Dave Eddy <dave@voxer.com>
+
+# Get a list of devices
+sds=$(kstat -l sderr | sed -e 's/sderr:\([0-9]*\):.*/\1/' | uniq)
+
+# Function to extract a value from kstat
+get_kstat() {
+	IFS=$'\t' read _ value _ < <(kstat -p "$1")
+	echo "$value"
+}
+
+ret=0
+err=''
+# Loop the devices
+while read sd; do
+	# Check the vendor, skip if it is KVM
+	vendor=$(get_kstat "sderr:$sd::Vendor")
+	[[ "$vendor" =~ "KVM" ]] && continue
+	# Check for hard errors
+	hard_errors=$(get_kstat "sderr:$sd::Hard Errors")
+	if (( hard_errors > 0 )); then
+		# Append to `err` string
+		err=${err:-CRIT}
+		err="$err sd $sd: $hard_errors Hard Errors;"
+		ret=2
+	fi
+done <<< "$sds"
+
+echo "${err:-OK: No hard errors found}"
+exit "$ret"

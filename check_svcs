@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Copyright 2010-2012 Voxer IP LLC. All rights reserved.
+# License: MIT
+#
+# Dave Eddy <dave@voxer.com>
+# Payam Voxer <operations@voxer.com>
+
+services=$(svcs -H -o state,fmri | egrep -v '^online|^legacy_run' | tr '\n' ';')
+
+if [[ -n "$services" ]]; then
+	echo "$services"
+	exit 2
+fi
+
+echo 'All services are online'
+exit 0
