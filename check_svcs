@@ -12,5 +12,5 @@ if [[ -n "$services" ]]; then
 	exit 2
 fi
 
-echo 'All services are online'
+echo 'ok: all services are online'
 exit 0

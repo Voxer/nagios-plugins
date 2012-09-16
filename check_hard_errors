@@ -26,11 +26,11 @@ while read sd; do
 	hard_errors=$(get_kstat "sderr:$sd::Hard Errors")
 	if (( hard_errors > 0 )); then
 		# Append to `err` string
-		err=${err:-CRIT}
-		err="$err sd $sd: $hard_errors Hard Errors;"
+		err=${err:-critical:}
+		err="$err sd $sd: $hard_errors hard errors;"
 		ret=2
 	fi
 done <<< "$sds"
 
-echo "${err:-OK: No hard errors found}"
+echo "${err:-ok: no hard errors found}"
 exit "$ret"
