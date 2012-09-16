@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+#
+# Check for high memory usage on an Illumos
+# based machine
+#
+# Not typically a problem in itself, but can
+# indicate future problems
+#
+# Author: Dave Eddy <dave@voxer.com>
+# Date: 9/14/2012
+# License: MIT
+
+warning=90
+critical=95
+while getopts 'w:c:' option; do
+	case "$option" in
+		w) warning=$OPTARG;;
+		c) critical=$OPTARG;;
+	esac
+done
+
+# Read the cap and the used rss
+while read name value; do
+	read "$name" <<< "$value"
+done < <(kstat -pc zone_memory_cap | egrep -o '(rss|physcap).*')
+
+# rss and physcap are now populated
+perc_used=$(( rss * 100 / physcap ))
+
+
+if [[ -z "$perc_used" ]]; then
+	echo 'unknown: error retrieving data'
+	exit 3
+elif (( perc_used >= critical )); then
+	echo -n 'critical: '
+	ret=2
+elif (( perc_used >= warning )); then
+	echo -n 'warning: '
+	ret=1
+else
+	echo -n 'ok: '
+	ret=0
+fi
+
+echo "$perc_used% used (warning=$warning%, critical=$critical%)"
+exit "$ret"

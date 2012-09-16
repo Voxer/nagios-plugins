@@ -14,6 +14,15 @@ Check for services in SMF that are not functioning properly
 
 Check kstat for hard errors - useful for identifying failing hardware
 
+### check_mem
+
+Like `check_disk` for memory usage using kstat to calculate used memory
+
+    Usage: check_mem -w 80 -c 90
+
+If the amount of used memory is greater than 90 go critical, over 80 is
+warning, anything else is OK
+
 License
 -------
 
