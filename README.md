@@ -10,18 +10,22 @@ Plugins
 
 Check for services in SMF that are not functioning properly
 
+    ~ $ ./check_svcs
+    ok: all services are online
+
 ### check_hard_errors
 
 Check kstat for hard errors - useful for identifying failing hardware
+
+    ~ $ ./check_hard_errors
+    ok: no hard errors found
 
 ### check_mem
 
 Like `check_disk` for memory usage using kstat to calculate used memory
 
-    Usage: check_mem -w 80 -c 90
-
-If the amount of used memory is greater than 90 go critical, over 80 is
-warning, anything else is OK
+    ~ $ ./check_mem -w 90 -c 95
+    ok: 4% used (warning=90%, critical=95%)
 
 License
 -------
