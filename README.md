@@ -27,6 +27,13 @@ Like `check_disk` for memory usage using kstat to calculate used memory
     ~ $ ./check_mem -w 90 -c 95
     ok: 4% used (warning=90%, critical=95%)
 
+Notes
+-----
+
+Some of the plugins (like `check_mem`) rely on GNU grep being present.
+You can install it with `pkgin in ggrep`, and then just make sure that
+`/opt/local/bin` is in your PATH.
+
 License
 -------
 
