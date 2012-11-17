@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# Check for disk busy on SmartOS
+#
+# This plugin assumes you are on the JPC
+# and uses disk `sd1`
+#
+# Author: Dave Eddy <dave@voxer.com>
+# Date: 11/16/12
+# License: MIT
+
+sample_time=1 # seconds to sample
+
+# Extract the values from kstat
+getvals() {
+	kstat -p sd:1:sd1 | egrep -o ':(rtime|wtime|snaptime).*' | tr -d :
+}
+
+# populate the kstat keys into variables
+populate() {
+	while read key val; do
+		read "$key$i" <<< "$val"
+	done < <(getvals)
+}
+
+warning=90
+critical=95
+while getopts 'w:c:' option; do
+	case "$option" in
+		w) warning=$OPTARG;;
+		c) critical=$OPTARG;;
+	esac
+done
+
+
+# grab the values, sleep for $sample_time seconds, grab more values
+i=1
+populate
+((i++))
+sleep "$sample_time"
+populate
+
+# calculate the percentage of time spent doing work during $sample_time seconds
+busy=$(bc <<< "((100 * $rtime2 + $wtime2) - (100 * $rtime1 + $wtime1)) / ($snaptime2 - $snaptime1)")
+
+# alert
+if [[ -z "$busy" ]]; then
+	echo 'unknown: error retrieving data'
+	exit 3
+elif (( busy >= critical )); then
+	echo -n 'critical: '
+	ret=2
+elif (( busy >= warning )); then
+	echo -n 'warning: '
+	ret=1
+else
+	echo -n 'ok: '
+	ret=0
+fi
+
+echo "disk $busy% busy (warning=$warning%, critical=$critical%)"
+exit "$ret"

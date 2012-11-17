@@ -27,6 +27,13 @@ Like `check_disk` for memory usage using kstat to calculate used memory
     ~ $ ./check_mem -w 90 -c 95
     ok: 4% used (warning=90%, critical=95%)
 
+### check_disk_busy
+
+Like `check_mem` for disk utilization
+
+    ~ $ ./check_disk_busy -w 90 -c 95
+    ok: disk 20% busy (warning=90%, critical=95%)
+
 Notes
 -----
 
