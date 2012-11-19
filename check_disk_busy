@@ -18,6 +18,7 @@ getvals() {
 
 # populate the kstat keys into variables
 populate() {
+	local i=$1
 	while read key val; do
 		read "$key$i" <<< "$val"
 	done < <(getvals)
@@ -34,11 +35,9 @@ done
 
 
 # grab the values, sleep for $sample_time seconds, grab more values
-i=1
-populate
-((i++))
+populate 1
 sleep "$sample_time"
-populate
+populate 2
 
 # calculate the percentage of time spent doing work during $sample_time seconds
 busy=$(bc <<< "((100 * $rtime2 + $wtime2) - (100 * $rtime1 + $wtime1)) / ($snaptime2 - $snaptime1)")
