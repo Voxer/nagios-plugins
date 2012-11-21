@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# Count the number of running processes
+#
+# This is not directly an indicator of a problem,
+# but instead is usually a symptom of a misbehaving
+# program
+#
+# Author: Dave Eddy <dave@voxer.com>
+# Date: 11/21/12
+# License: MIT
+
+warning=250
+critical=400
+while getopts 'w:c:' option; do
+	case "$option" in
+		w) warning=$OPTARG;;
+		c) critical=$OPTARG;;
+	esac
+done
+
+count=$(ls -1 /proc | wc -l)
+
+if [[ -z $count ]]; then
+	echo 'unknown: could not count procs in /proc'
+	exit 3
+elif (( count >= critical )); then
+	echo -n 'critical: '
+	ret=2
+elif (( count >= warning )); then
+	echo -n 'warning: '
+	ret=1
+else
+	echo -n 'ok: '
+	ret=0
+fi
+
+echo "$count processes running"
+exit "$ret"

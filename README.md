@@ -34,6 +34,15 @@ Like `check_mem` for disk utilization
     ~ $ ./check_disk_busy -w 90 -c 95
     ok: disk 20% busy (warning=90%, critical=95%)
 
+### check_proc_count
+
+Count and alert on the number of running processes.  The benefit of this check
+over the built-in `check_proc` is that this script only does process count, so
+it is fast, and also does not require escalated privileges.
+
+    ~ $ ./check_proc_count -w 200 -c 400
+    ok: 30 processes running
+
 Notes
 -----
 
