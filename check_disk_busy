@@ -2,9 +2,6 @@
 #
 # Check for disk busy on SmartOS
 #
-# This plugin assumes you are on the JPC
-# and uses disk `sd1`
-#
 # Author: Dave Eddy <dave@voxer.com>
 # Date: 11/16/12
 # License: MIT
@@ -13,7 +10,7 @@ sample_time=1 # seconds to sample
 
 # Extract the values from kstat
 getvals() {
-	kstat -p sd:1:sd1 | egrep -o ':(rtime|wtime|snaptime).*' | tr -d :
+	kstat -p "::$disk:" | egrep -o ':(rtime|wtime|snaptime).*' | tr -d :
 }
 
 # populate the kstat keys into variables
@@ -32,7 +29,9 @@ while getopts 'w:c:' option; do
 		c) critical=$OPTARG;;
 	esac
 done
+shift $((OPTIND - 1))
 
+disk=${1:-sd1}
 
 # grab the values, sleep for $sample_time seconds, grab more values
 populate 1
@@ -45,6 +44,8 @@ busy=$(bc <<< "((100 * $rtime2 + $wtime2) - (100 * $rtime1 + $wtime1)) / ($snapt
 # alert
 if [[ -z "$busy" ]]; then
 	echo 'unknown: error retrieving data'
+	echo '- possible disks -' >&2
+	kstat -lc disk :::class | awk -F: '{print $3}' >&2
 	exit 3
 elif (( busy >= critical )); then
 	echo -n 'critical: '
@@ -57,5 +58,5 @@ else
 	ret=0
 fi
 
-echo "disk $busy% busy (warning=$warning%, critical=$critical%)"
+echo "disk $busy% busy (warning=$warning%, critical=$critical%, disk=$disk)"
 exit "$ret"

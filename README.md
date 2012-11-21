@@ -31,8 +31,12 @@ Like `check_disk` for memory usage using kstat to calculate used memory
 
 Like `check_mem` for disk utilization
 
-    ~ $ ./check_disk_busy -w 90 -c 95
-    ok: disk 20% busy (warning=90%, critical=95%)
+    ~ $ ./check_disk_busy -w 90 -c 95 sd1
+    ok: disk 20% busy (warning=90%, critical=95%, disk=sd1)
+
+The final argument is the disk name to check (defaults to `sd1`), if
+you supply an invalid name, a list of all disks will be printed to
+stderr.
 
 ### check_proc_count
 
