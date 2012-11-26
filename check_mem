@@ -21,8 +21,9 @@ done
 
 # Read the cap and the used rss
 while read name value; do
+	IFS=: read _ _ _ name <<< "$name"
 	read "$name" <<< "$value"
-done < <(kstat -pc zone_memory_cap | egrep -o '(rss|physcap).*')
+done < <(kstat -pc zone_memory_cap :::rss :::physcap)
 
 # rss and physcap are now populated
 perc_used=$(( rss * 100 / physcap ))
