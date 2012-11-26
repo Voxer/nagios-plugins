@@ -10,13 +10,14 @@ sample_time=1 # seconds to sample
 
 # Extract the values from kstat
 getvals() {
-	kstat -p "::$disk:" | egrep -o ':(rtime|wtime|snaptime).*' | tr -d :
+	kstat -p ::"$disk":{rtime,wtime,snaptime}
 }
 
 # populate the kstat keys into variables
 populate() {
 	local i=$1
-	while read key val; do
+	while read name val; do
+		IFS=: read _ _ _ key <<< "$name"
 		read "$key$i" <<< "$val"
 	done < <(getvals)
 }
