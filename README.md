@@ -50,9 +50,12 @@ it is fast, and also does not require escalated privileges.
 Notes
 -----
 
-Some of the plugins (like `check_mem`) rely on GNU grep being present.
+Some of the plugins rely on GNU grep being present.
 You can install it with `pkgin in ggrep`, and then just make sure that
-`/opt/local/bin` is in your PATH.
+`/opt/local/bin` is in your PATH. The following list is the plugins that
+require GNU grep being present.
+
+* check_svcs
 
 License
 -------
