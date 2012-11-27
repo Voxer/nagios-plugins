@@ -7,7 +7,7 @@
 # Author: Dave Eddy <dave@voxer.com>
 
 # Get a list of devices
-sds=$(kstat -l sderr | sed -e 's/sderr:\([0-9]*\):.*/\1/' | uniq)
+sds=$(kstat -l sderr:::class | awk -F: '{print $2}')
 
 # Function to extract a value from kstat
 get_kstat() {
