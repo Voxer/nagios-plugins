@@ -47,6 +47,21 @@ it is fast, and also does not require escalated privileges.
     ~ $ ./check_proc_count -w 200 -c 400
     ok: 30 processes running
 
+### check_proc_owners
+
+Look for running processes with an invalid or removed UID.  This is usually
+a sign that an automatically generated user from something like `pkgin` has
+been clobbered by configuration management software.
+
+    ~ $ ./check_proc_owners
+    critical: 2 processes found without valid UIDs
+    ~ $ ./check_proc_owners -v
+    critical: 2 processes found without valid UIDs
+    pid 47247 (uid 2033): sh
+    pid 47251 (uid 2033): node server.js v
+
+Supply `-v` for verbose output, suitable for interactive use.
+
 Notes
 -----
 

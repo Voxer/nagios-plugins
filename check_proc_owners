@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+#
+# Check all running processes on a
+# machine to verify they have a valid UID
+#
+# Author: Dave Eddy <dave@voxer.com>
+# Date: 12/18/2012
+# License: MIT
+
+verbose=false
+[[ $1 == '-v' ]] && verbose=true
+
+out=$(stat -c '%u %U %n' /proc/* | grep ' UNKNOWN ')
+if [[ -z "$out" ]]; then
+	echo 'ok: all processe have valid UIDs'
+	exit 0
+fi
+
+# if there is output, there is a problem
+lines=$(wc -l <<< "$out")
+echo "critical: $lines processes found without valid UIDs"
+if $verbose; then
+	while read uid _ name; do
+		pid=${name##*/}
+		echo "pid $pid (uid $uid): $(ps -p "$pid" -o args | tail -1)"
+	done <<< "$out"
+fi
+exit 2
