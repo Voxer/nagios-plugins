@@ -6,12 +6,16 @@
 #
 # Author: Dave Eddy <dave@voxer.com>
 
+# blacklisted vendors
+skipvendors=('KVM' 'TEAC')
+
 # Get a list of devices
 sds=$(kstat -l sderr:::class | awk -F: '{print $2}')
 
 # Function to extract a value from kstat
 get_kstat() {
 	IFS=$'\t' read _ value _ < <(kstat -p "$1")
+	read value <<< "$value"
 	echo "$value"
 }
 
@@ -19,9 +23,18 @@ ret=0
 err=''
 # Loop the devices
 while read sd; do
-	# Check the vendor, skip if it is KVM
+	# Check the vendor, skip it if it's blacklisted
 	vendor=$(get_kstat "sderr:$sd::Vendor")
-	[[ "$vendor" =~ "KVM" ]] && continue
+
+	skip=false
+	for v in "${skipvendors[@]}"; do
+		if [[ "$vendor" == "$v" ]]; then
+			skip=true
+			break
+		fi
+	done
+	$skip && continue
+
 	# Check for hard errors
 	hard_errors=$(get_kstat "sderr:$sd::Hard Errors")
 	if (( hard_errors > 0 )); then
