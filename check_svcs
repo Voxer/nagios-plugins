@@ -4,11 +4,22 @@
 #
 # Dave Eddy <dave@voxer.com>
 # Payam Voxer <operations@voxer.com>
+#
+# Credits
+# claudio k.
 
-services=$(svcs -H -o state,fmri | egrep -v '^online|^legacy_run' | tr '\n' ';')
+# check if svcs is working, thanks claudio!
+services=$(svcs -H -o state,fmri 2>&1)
+if (($? != 0)); then
+	echo "critical: $services"
+	exit 2
+fi
+
+# find the troubled processes if any exist
+services=$(egrep -v '^online|^legacy_run' <<< "$services" | tr '\n' ';')
 
 if [[ -n "$services" ]]; then
-	echo "$services"
+	echo "critical: $services"
 	exit 2
 fi
 
