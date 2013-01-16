@@ -12,8 +12,10 @@
 
 warning=250
 critical=400
-while getopts 'w:c:' option; do
+perfdata=true
+while getopts 'nw:c:' option; do
 	case "$option" in
+		n) perfdata=false;;
 		w) warning=$OPTARG;;
 		c) critical=$OPTARG;;
 	esac
@@ -35,5 +37,6 @@ else
 	ret=0
 fi
 
-echo "$count processes running"
+echo -n "$count processes running"
+$perfdata && echo "|proc_count=$count" || echo
 exit "$ret"

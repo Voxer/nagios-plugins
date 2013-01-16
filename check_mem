@@ -12,8 +12,10 @@
 
 warning=90
 critical=95
-while getopts 'w:c:' option; do
+perfdata=true
+while getopts 'nw:c:' option; do
 	case "$option" in
+		n) perfdata=false;;
 		w) warning=$OPTARG;;
 		c) critical=$OPTARG;;
 	esac
@@ -43,5 +45,6 @@ else
 	ret=0
 fi
 
-echo "$perc_used% used (warning=$warning%, critical=$critical%)"
+echo -n "$perc_used% used (warning=$warning%, critical=$critical%)"
+$perfdata && echo "|mem_used=$rss;mem_cap=$physcap" || echo
 exit "$ret"

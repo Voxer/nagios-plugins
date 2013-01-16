@@ -25,14 +25,14 @@ Check kstat for hard errors - useful for identifying failing hardware
 Like `check_disk` for memory usage using kstat to calculate used memory
 
     ~ $ ./check_mem -w 90 -c 95
-    ok: 4% used (warning=90%, critical=95%)
+    ok: 7% used (warning=90%, critical=95%)|mem_used=303812608;mem_cap=4294967296
 
 ### check_disk_busy
 
 Like `check_mem` for disk utilization
 
     ~ $ ./check_disk_busy -w 90 -c 95 sd1
-    ok: disk 20% busy (warning=90%, critical=95%, disk=sd1)
+    ok: disk 1% busy (warning=90%, critical=95%, disk=sd1)|disk_busy=1
 
 The final argument is the disk name to check (defaults to `sd1`), if
 you supply an invalid name, a list of all disks will be printed to
@@ -45,7 +45,7 @@ over the built-in `check_proc` is that this script only does process count, so
 it is fast, and also does not require escalated privileges.
 
     ~ $ ./check_proc_count -w 200 -c 400
-    ok: 30 processes running
+    ok: 37 processes running|proc_count=37
 
 ### check_proc_owners
 
@@ -64,6 +64,9 @@ Supply `-v` for verbose output, suitable for interactive use.
 
 Notes
 -----
+
+Run any script that outputs perf data at the end with a `-n` switch
+to suppress that output.
 
 Some of the plugins rely on GNU grep being present.
 You can install it with `pkgin in ggrep`, and then just make sure that
