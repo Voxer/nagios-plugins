@@ -21,7 +21,7 @@ while getopts 'nw:c:' option; do
 	esac
 done
 
-count=$(ls -1 /proc | wc -l)
+count=$(ls -U1 /proc | wc -l)
 
 if [[ -z $count ]]; then
 	echo 'unknown: could not count procs in /proc'
