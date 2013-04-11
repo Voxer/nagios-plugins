@@ -20,6 +20,18 @@ Check kstat for hard errors - useful for identifying failing hardware
     ~ $ ./check_hard_errors
     ok: no hard errors found
 
+### check_flapping_services
+
+Look for flapping services in SMF (rapidly restarting services)
+
+    ~ $ ./check_flapping_services
+    ok: no flapping services detected
+
+If a service is flapping it will exit with critical status and print the service name(s)
+
+    ~ $ ./check_flapping_services
+    critical: flapping services found, svc:/application/voxer/dave-process:default
+
 ### check_mem
 
 Like `check_disk` for memory usage using kstat to calculate used memory

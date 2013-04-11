@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+#
+# check for flapping services in SMF
+#
+# Author: Dave Eddy <dave@daveeddy.com>
+# Date: 4/11/13
+# License: MIT
+
+# first check svcs
+if ! svcs 2>&1 > /dev/null; then
+	exit 2
+fi
+
+# sample
+output=
+for i in {1..30}; do
+	output=$(svcs -a | grep \*)$output
+done
+
+if [[ -z $output ]]; then
+	echo 'ok: no flapping services detected'
+	exit 0
+fi
+
+output=$(awk '{ a[$3] } END { for (i in a) printf(", %s", i) }' <<< "$output")
+echo "critical: flapping services found$output"
+exit 2
