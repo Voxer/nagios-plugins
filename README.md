@@ -68,13 +68,6 @@ Notes
 Run any script that outputs perf data at the end with a `-n` switch
 to suppress that output.
 
-Some of the plugins rely on GNU grep being present.
-You can install it with `pkgin in ggrep`, and then just make sure that
-`/opt/local/bin` is in your PATH. The following list is the plugins that
-require GNU grep being present.
-
-* check_svcs
-
 License
 -------
 
