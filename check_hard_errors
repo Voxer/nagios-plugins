@@ -9,6 +9,11 @@
 # blacklisted vendors
 skipvendors=('KVM' 'TEAC')
 
+# blacklisted sd
+#skipsd=('1' '2' '3')
+skipsd=()
+
+
 # Get a list of devices
 sds=$(kstat -l sderr:::class | awk -F: '{print $2}')
 
@@ -23,10 +28,21 @@ ret=0
 err=''
 # Loop the devices
 while read sd; do
+
+	skip=false
+
+	# Chesk if the sd is blacklisted
+        for v in "${skipsd[@]}"; do
+                if [[ "$sd" == "$v" ]]; then
+                        skip=true
+                        break
+                fi
+        done
+        $skip && continue
+
 	# Check the vendor, skip it if it's blacklisted
 	vendor=$(get_kstat "sderr:$sd::Vendor")
 
-	skip=false
 	for v in "${skipvendors[@]}"; do
 		if [[ "$vendor" == "$v" ]]; then
 			skip=true
