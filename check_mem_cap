@@ -11,10 +11,22 @@ nover=$(kstat -p 'memory_cap:::nover' | awk '{print $2}')
 if [[ -z "$nover" ]]; then
 	echo 'unknown: nover could not be determined'
 	exit 3
-elif (( nover == 0 )); then
-	echo 'ok: nover is 0'
-	exit 0
-else
-	echo "critical: nover is $nover"
-	exit 2
 fi
+
+if (( nover == 0 )); then
+	ret=0
+	echo -n 'ok: '
+else
+	ret=2
+	echo -n 'critical: '
+fi
+
+echo -n "nover is $nover"
+
+if [[ $1 == '-n' ]]; then
+	echo
+else
+	echo "|nover=$nover"
+fi
+
+exit "$ret"

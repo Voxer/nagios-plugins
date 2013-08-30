@@ -39,6 +39,13 @@ Like `check_disk` for memory usage using kstat to calculate used memory
     ~ $ ./check_mem -w 90 -c 95
     ok: 7% used (warning=90%, critical=95%)|mem_used=303812608;mem_cap=4294967296
 
+### check_mem_cap
+
+Like `check_mem`, but checks to see if you are over the memory allocated for your zone
+
+    ~ $ ./check_mem_cap
+    ok: nover is 0|nover=0
+
 ### check_disk_busy
 
 Like `check_mem` for disk utilization
