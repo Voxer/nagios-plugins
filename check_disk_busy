@@ -62,6 +62,6 @@ else
 	ret=0
 fi
 
-echo -n "disk $busy% busy (warning=$warning%, critical=$critical%, disk=$disk)"
+echo -n "disk $busy% busy (warning=$warning%, critical=$critical%)"
 $perfdata && echo "|disk_busy=$busy" || echo
 exit "$ret"
