@@ -7,12 +7,15 @@
 # indicate future problems
 #
 # Author: Dave Eddy <dave@voxer.com>
-# Date: 9/14/2012
 # License: MIT
+# Creation Date: 9/14/2012
+# 01/10/2014 Added check for global zone
 
 warning=90
 critical=95
 perfdata=true
+tmpoutfile=/tmp/check_mem.tmp
+
 while getopts 'nw:c:' option; do
 	case "$option" in
 		n) perfdata=false;;
@@ -21,15 +24,33 @@ while getopts 'nw:c:' option; do
 	esac
 done
 
-# Read the cap and the used rss
-while read name value; do
-	IFS=: read _ _ _ name <<< "$name"
-	read "$name" <<< "$value"
-done < <(kstat -pc zone_memory_cap :::rss :::physcap)
-
-# rss and physcap are now populated
-perc_used=$(( rss * 100 / physcap ))
-
+# Am I on a global or non-global zone?
+if [ $(zonename) = "global" ]
+then
+  # We're on a gz, sum up rss from all zones
+  i=0
+  for value in $(kstat -pc zone_memory_cap :::rss | awk '{print $NF}'); do 
+    i=$(($i + $value))
+  done
+  # The global zone rss is missing in kstat, so we get it from prstat
+  prstat -Z -z 0 1 1 > $tmpoutfile
+  gzrssmb=$(cat $tmpoutfile | sed -n "/ZONEID/,/Total/p" | sed -n "2p" | awk '{print $4}' | awk -FM '{print $1}')
+  gzrss=$(( $gzrssmb * 1024 * 1024))
+  rss=$(($i + $gzrss))
+  physcapmb=$(prtconf |grep "Memory size" | awk '{print $3}')
+  physcap=$(( $physcapmb * 1024 * 1024))
+  # rss and physcap are now populated
+  perc_used=$(( $rss * 100 / $physcap))
+  rm $tmpoutfile
+else
+  # Read the cap and the used rss on a ngz
+  while read name value; do
+        IFS=: read _ _ _ name <<< "$name"
+        read "$name" <<< "$value"
+  done < <(kstat -pc zone_memory_cap :::rss :::physcap)
+  # rss and physcap are now populated
+  perc_used=$(( rss * 100 / physcap ))
+fi
 
 if [[ -z "$perc_used" ]]; then
 	echo 'unknown: error retrieving data'
