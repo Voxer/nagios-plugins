@@ -11,16 +11,21 @@
 # check if svcs is working, thanks claudio!
 services=$(svcs -H -o state,fmri 2>&1)
 if (($? != 0)); then
-	echo "critical: $services"
-	exit 2
+    echo "critical: problem with SMF (maybe kill svc.startd?)"
+    exit 2
 fi
 
-# find the troubled processes if any exist
-services=$(egrep -v '^online|^legacy_run' <<< "$services" | tr '\n' ';')
+# find the troubled processes if any exist ('disable -t' is not troubled)
+services=$(egrep -v '^online|^legacy_run|^disabled' <<< "$services" | tr '\n' ';')
 
 if [[ -n "$services" ]]; then
-	echo "critical: $services"
-	exit 2
+    if [[ $(grep 'maintenance' <<< "$services") ]]; then
+        echo "critical: $services"
+        exit 2
+    else	
+        echo "warning: $services"
+        exit 1
+    fi
 fi
 
 echo 'ok: all services are online'
