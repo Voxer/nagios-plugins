@@ -19,7 +19,7 @@ fi
 services=$(egrep -v '^online|^legacy_run|^disabled' <<< "$services" | tr '\n' ';')
 
 if [[ -n $services ]]; then
-	if grep -q 'maintenance' <<< "$services"; then
+	if grep -q '^maintenance' <<< "$services"; then
 		echo "critical: $services"
 		exit 2
 	else
