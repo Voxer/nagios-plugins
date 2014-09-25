@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+#
+# Check bash for CVE-2014-6271 (shellshock)
+# http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2014-6271
+#
+# Author: Dave Eddy <dave@daveeddy.com>
+# Date: September 25, 2014
+# License: MIT
+
+bash=${1:-bash}
+
+vuln=$(foo='() { :; }; echo vulnerable' "$bash" -c true 2>/dev/null)
+code=$?
+
+if ((code != 0)); then
+	echo "unknown: $bash return $code"
+	exit 3
+elif [[ $vuln == vulnerable ]]; then
+	echo "critical: $bash is vulnerable to shellshock"
+	exit 2
+else
+	echo "ok: $bash is secure against shellshock"
+	exit 0
+fi

@@ -43,16 +43,15 @@ while getopts 'nw:c:' option; do
 done
 
 read rss cap < <(rss_and_cap)
-perc_used=$(( rss * 100 / cap ))
+perc_used=$((rss * 100 / cap))
 
-
-if [[ -z "$perc_used" ]]; then
+if [[ -z $perc_used ]]; then
 	echo 'unknown: error retrieving data'
 	exit 3
-elif (( perc_used >= critical )); then
+elif ((perc_used >= critical)); then
 	echo -n 'critical: '
 	ret=2
-elif (( perc_used >= warning )); then
+elif ((perc_used >= warning)); then
 	echo -n 'warning: '
 	ret=1
 else

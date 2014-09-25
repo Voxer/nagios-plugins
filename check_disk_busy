@@ -48,7 +48,7 @@ shift $((OPTIND - 1))
 busy=$(busy)
 
 # alert
-if [[ -z "$busy" ]]; then
+if [[ -z $busy ]]; then
 	echo 'unknown: error retrieving data'
 	exit 3
 elif (( busy >= critical )); then

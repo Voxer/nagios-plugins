@@ -13,7 +13,7 @@ if [[ -z "$nover" ]]; then
 	exit 3
 fi
 
-if (( nover == 0 )); then
+if ((nover == 0)); then
 	ret=0
 	echo -n 'ok: '
 else
