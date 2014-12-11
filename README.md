@@ -20,6 +20,18 @@ You can pass an optional binary to check as the first argument, defaults to `bas
     $ check_shellshock ./out/bin/bash
     ok: ./out/bin/bash is secure against shellshock
 
+### check_kernel_age
+
+Check the age of the SmartOS kernel version
+
+    $ check_kernel_version
+    warning: joyent_20140530T010428Z - 6 months old (195 days)
+
+Pass arguments to modify `warn` and `crit` thresholds (respectively) in days
+
+    $ check_kernel_age 300 600
+    ok: joyent_20140530T010428Z - 6 months old (195 days)
+
 ### check_svcs
 
 Check for services in SMF that are not functioning properly

@@ -1,0 +1,79 @@
+#!/usr/bin/env node
+/**
+ * check the age of the SmartOS kernel
+ *
+ * Author: Dave Eddy <dave@daveeddy.com>
+ * Date: December 11, 2014
+ * License: MIT
+ */
+
+var assert = require('assert');
+var execFile = require('child_process').execFile;
+var util = require('util');
+
+var warn = +process.argv[2] || 180;
+var crit = +process.argv[3] || 360;
+
+// given a date object, return a human readable string
+// denoting a relative date
+function relativeDate(a) {
+  var seconds = (Date.now() - a) / 1000;
+  var suffix = seconds < 0 ? 'new' : 'old';
+
+  var times = [
+    seconds / 60 / 60 / 24 / 365, // years
+    seconds / 60 / 60 / 24 / 30,  // months
+    seconds / 60 / 60 / 24,       // days
+    seconds / 60 / 60,            // hours
+    seconds / 60,                 // minutes
+    seconds                       // seconds
+  ];
+  var names = ['year', 'month', 'day', 'hour', 'minute', 'second'];
+
+  for (var i = 0; i < names.length; i++) {
+    var time = Math.floor(times[i]);
+    if (time > 1)
+      return util.format('%d %ss %s', time, names[i], suffix);
+    else if (time === 1)
+      return util.format('%d %s %s', time, names[i], suffix);
+  }
+  return util.format('0 seconds %s', suffix);
+}
+
+// get the kernel version
+execFile('uname', ['-v'], {}, function(err, stdout, stderr) {
+  // check for errors
+  var e = err || stderr;
+  if (e) {
+    console.log('unknown: command failed - %s', e.message || e);
+    process.exit(3);
+  }
+
+  // parse the kernel name
+  var kernel = stdout.trim();
+  var date;
+  try {
+    date = new Date(kernel.match(/_(\d{4})(\d{2})(\d{2})/).slice(1).join('-'));
+    assert(date instanceof Date && isFinite(date));
+  } catch(e) {
+    console.log('unknown: failed to parse kernel - "%s" -%s', kernel, e.message);
+    process.exit(3);
+  }
+
+  // calculate how old the kernel is
+  var daysold = Math.floor(((new Date()) - date) / 1000 / 60 / 60 / 24);
+  var relative = relativeDate(date);
+
+  var code = 0;
+  var msg = 'ok';
+  if (daysold >= crit) {
+    code = 2;
+    msg = 'critical';
+  } else if (daysold >= warn) {
+    code = 1;
+    msg = 'warning';
+  }
+
+  console.log('%s: %s - %s (%d days)', msg, kernel, relative, daysold);
+  process.exit(code);
+});
